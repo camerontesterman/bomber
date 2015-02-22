@@ -6,7 +6,10 @@ OFFSET=0
 NAMES="$HOME/.bomber/names"
 URLS="$HOME/.bomber/urls"
 XML="$HOME/.bomber/xml"
-APIKEY="XXX"
+VIDEOS="$HOME/.bomber/videos/"
+VIDEONAMES="$HOME/.bomber/videonames"
+VIDEOFILES="$HOME/.bomber/videofiles"
+APIKEY=XXX
 
 
 #parse options
@@ -44,7 +47,9 @@ case $1 in
    "get")
       DETAIL=`sed "$2!d" $URLS`?api_key=$APIKEY
       DOWNLOAD=`curl $DETAIL | xml sel -t -m //results -v low_url`
-      curl -O $DOWNLOAD
+      echo $DOWNLOAD | sed 's/.*\///' >> $VIDEOFILES
+      sed "$2!d" $NAMES >> $VIDEONAMES
+      cd $VIDEOS && { curl -O $DOWNLOAD ; cd - ; }
       ;;
    "list")
       cat $NAMES
@@ -56,7 +61,21 @@ case $1 in
       curl -o $XML "http://www.giantbomb.com/api/search/?api_key=$APIKEY&query=$2&resources=video"
       extract video
       ;;
+   "have")
+      less -N -I $VIDEONAMES
+      ;;
+   "watch")
+      mpv $VIDEOS`sed "$2!d" $VIDEOFILES`
+      ;;
+   "remove")
+      rm $VIDEOS`sed "$2!d" $VIDEOFILES`
+      sed -i "$2d" $VIDEONAMES
+      sed -i "$2d" $VIDEOFILES
+      ;;
+   "")
+      echo "Please specify a command."
+      ;;
    *)
-   echo "$1 is not a valid command."
+      echo "$1 is not a valid command."
       ;;
 esac
