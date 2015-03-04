@@ -23,6 +23,7 @@ fi
 
 #write helptext
 HELPTEXT='bomber: download videos from Giant Bomb using the api.
+v0.3
 
 Usage: bomber <command> [argument] [options]
 
