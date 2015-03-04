@@ -9,8 +9,13 @@ XML="$HOME/.bomber/xml"
 VIDEOS="$HOME/.bomber/videos/"
 VIDEONAMES="$HOME/.bomber/videonames"
 VIDEOFILES="$HOME/.bomber/videofiles"
-APIKEY=XXX
+APIKEY="XXX"
 
+if [ $APIKEY == "XXX" ]; then
+   echo "Please set your api-key in the script file."
+   echo "You can find your api-key on http://giantbomb.com/api while logged in."
+   exit
+fi
 
 #parse options
 OPTIND=2
