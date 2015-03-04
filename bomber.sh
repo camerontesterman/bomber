@@ -1,16 +1,20 @@
 #!/bin/bash
 
+#set api-key
+APIKEY="XXX"
 
-#set defaults
-OFFSET=0
+#set folders and files
 NAMES="$HOME/.bomber/names"
 URLS="$HOME/.bomber/urls"
 XML="$HOME/.bomber/xml"
 VIDEOS="$HOME/.bomber/videos/"
 VIDEONAMES="$HOME/.bomber/videonames"
 VIDEOFILES="$HOME/.bomber/videofiles"
-APIKEY="XXX"
 
+#set defaults
+OFFSET=0
+
+#check for api-key
 if [ $APIKEY == "XXX" ]; then
    echo "Please set your api-key in the script file."
    echo "You can find your api-key on http://giantbomb.com/api while logged in."
@@ -22,11 +26,10 @@ OPTIND=2
 while getopts ":o:" opt; do
    case $opt in
       o)
-         echo "o was triggered $OPTARG" >&2
          OFFSET=$OPTARG
          ;;
       \?)
-         echo "Invalid" >&2
+         echo "Invalid"
          ;;
    esac
 done
