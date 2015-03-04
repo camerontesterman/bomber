@@ -77,6 +77,13 @@ case $1 in
       sed -i "$2d" $VIDEONAMES
       sed -i "$2d" $VIDEOFILES
       ;;
+   "clear")
+      while read file; do
+         rm $VIDEOS$file
+      done < $VIDEOFILES
+      rm $VIDEONAMES
+      rm $VIDEOFILES
+      ;;
    "")
       echo "Please specify a command."
       ;;
