@@ -59,9 +59,6 @@ case $1 in
       sed "$2!d" $NAMES >> $VIDEONAMES
       cd $VIDEOS && { curl -O $DOWNLOAD ; cd - ; }
       ;;
-   "list")
-      cat $NAMES
-      ;;
    "view")
       less -N -I $NAMES
       ;;
@@ -69,7 +66,7 @@ case $1 in
       curl -o $XML "http://www.giantbomb.com/api/search/?api_key=$APIKEY&query=$2&resources=video"
       extract video
       ;;
-   "have")
+   "list")
       less -N -I $VIDEONAMES
       ;;
    "watch")
