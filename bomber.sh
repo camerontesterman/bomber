@@ -13,6 +13,8 @@ VIDEOFILES="$HOME/.bomber/videofiles"
 
 #set defaults
 OFFSET=0
+FILE=false
+FILEPATH=""
 
 #check for api-key
 if [ $APIKEY == "XXX" ]; then
@@ -25,7 +27,7 @@ fi
 HELPTEXT='bomber: download videos from Giant Bomb using the api.
 v0.3
 
-Usage: bomber <command> [argument] [options]
+Usage: bomber <command> [options] [argument]
 
 Commands:
    update    update the list of videos that are available to download
@@ -39,7 +41,8 @@ Commands:
    clear     delete all downloaded videos
 
 Options:
-   -o        specify the offset from the beginning when using "update" and "premium"'
+   -o        specify the offset from the beginning when using "update" and "premium"
+   -f        specify where to save a file instead of managing videos internally'
 
 #check for h option
 getopts ":h" opt
@@ -50,7 +53,8 @@ fi
 
 #parse options
 OPTIND=2
-while getopts ":o:" opt; do
+while getopts "o:f:" opt; do
+   echo $opt
    case $opt in
       o)
          OFFSET=$OPTARG
@@ -58,11 +62,17 @@ while getopts ":o:" opt; do
       h)
          echo -e $HELPTEXT
          ;;
+      f)
+         FILE=true
+         FILEPATH=$OPTARG
+         ;;
       \?)
-         echo "Invalid"
+         echo "Invalid $opt"
          ;;
    esac
 done
+#get argument
+eval ARGUMENT='$'$OPTIND
 
 #define functions
 extract () {
@@ -82,11 +92,15 @@ case $1 in
       extract video
       ;;
    "get")
-      DETAIL=`sed "$2!d" $URLS`?api_key=$APIKEY
+      DETAIL=`sed "$ARGUMENT!d" $URLS`?api_key=$APIKEY
       DOWNLOAD=`curl $DETAIL | xml sel -t -m //results -v low_url`
-      echo $DOWNLOAD | sed 's/.*\///' >> $VIDEOFILES
-      sed "$2!d" $NAMES >> $VIDEONAMES
-      cd $VIDEOS && { curl -O $DOWNLOAD ; cd - ; }
+      if [ "$FILE" = true ]; then
+         curl -o $FILEPATH $DOWNLOAD
+      else
+         echo $DOWNLOAD | sed 's/.*\///' >> $VIDEOFILES
+         sed "$ARGUMENT!d" $NAMES >> $VIDEONAMES
+         cd $VIDEOS && { curl -O $DOWNLOAD ; cd - ; }
+      fi
       ;;
    "view")
       less -N -I $NAMES
