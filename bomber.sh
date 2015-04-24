@@ -127,6 +127,15 @@ case $1 in
       rm $VIDEONAMES
       rm $VIDEOFILES
       ;;
+   "bomb")
+      echo "3..."
+      sleep 1
+      echo "2..."
+      sleep 1
+      echo "1..."
+      sleep 1
+      echo "BOOM!!!"
+      ;;
    "")
       echo "Please specify a command."
       ;;
