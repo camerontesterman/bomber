@@ -70,8 +70,11 @@ while getopts "o:f:nh" opt; do
          ;;
    esac
 done
-#get argument
-eval ARGUMENT='$'$OPTIND
+#get command
+COMMAND=$1
+
+#shift to arguments
+shift $((OPTIND-1))
 
 #define functions
 extract () {
@@ -81,7 +84,7 @@ extract () {
 
 
 #execute command
-case $1 in
+case $COMMAND in
    "update")
       curl -o $XML "http://www.giantbomb.com/api/videos/?api_key=$APIKEY&offset=$OFFSET"
       extract video
@@ -91,7 +94,7 @@ case $1 in
       extract video
       ;;
    "get")
-      DETAIL=`sed "$ARGUMENT!d" $URLS`?api_key=$APIKEY
+      DETAIL=`sed "$@!d" $URLS`?api_key=$APIKEY
       DOWNLOAD=`curl $DETAIL | xml sel -t -m //results -v $QUALITY`
       if [ "$EDIT" = true ]; then
          DOWNLOAD=`echo $DOWNLOAD| sed -e "s/1800/1000/g"`
@@ -100,7 +103,7 @@ case $1 in
          curl -o $FILEPATH $DOWNLOAD
       else
          echo $DOWNLOAD | sed 's/.*\///' >> $VIDEOFILES
-         sed "$ARGUMENT!d" $NAMES >> $VIDEONAMES
+         sed "$@!d" $NAMES >> $VIDEONAMES
          cd $VIDEOS && { curl -O $DOWNLOAD ; cd - ; }
       fi
       ;;
@@ -108,19 +111,19 @@ case $1 in
       less -N -I $NAMES
       ;;
    "search")
-      curl -o $XML "http://www.giantbomb.com/api/search/?api_key=$APIKEY&query=$2&resources=video"
+      curl -o $XML "http://www.giantbomb.com/api/search/?api_key=$APIKEY&query=$@&resources=video"
       extract video
       ;;
    "list")
       less -N -I $VIDEONAMES
       ;;
    "watch")
-      mpv $VIDEOS`sed "$2!d" $VIDEOFILES`
+      mpv $VIDEOS`sed "$@!d" $VIDEOFILES`
       ;;
    "remove")
-      rm $VIDEOS`sed "$2!d" $VIDEOFILES`
-      sed -i "$2d" $VIDEONAMES
-      sed -i "$2d" $VIDEOFILES
+      rm $VIDEOS`sed "$@!d" $VIDEOFILES`
+      sed -i "$@d" $VIDEONAMES
+      sed -i "$@d" $VIDEOFILES
       ;;
    "clear")
       while read file; do
@@ -142,6 +145,6 @@ case $1 in
       echo "Please specify a command."
       ;;
    *)
-      echo "$1 is not a valid command."
+      echo "$COMMAND is not a valid command."
       ;;
 esac
