@@ -12,9 +12,11 @@ VIDEONAMES="$HOME/.bomber/videonames"
 VIDEOFILES="$HOME/.bomber/videofiles"
 
 #set defaults
+QUALITY=low_url
 OFFSET=0
 FILE=false
 FILEPATH=""
+EDIT=false
 
 #check for api-key
 if [ $APIKEY == "XXX" ]; then
@@ -42,18 +44,12 @@ Commands:
 
 Options:
    -o        specify the offset from the beginning when using "update" and "premium"
-   -f        specify where to save a file instead of managing videos internally'
-
-#check for h option
-getopts ":h" opt
-if [ $opt == "h" ]; then
-   echo -e "$HELPTEXT"
-   exit
-fi
+   -f        specify where to save a file instead of managing videos internally
+   -n        retrieve 1000 instead of 1800 for newer videos'
 
 #parse options
 OPTIND=2
-while getopts "o:f:" opt; do
+while getopts "o:f:nh" opt; do
    echo $opt
    case $opt in
       o)
@@ -65,6 +61,9 @@ while getopts "o:f:" opt; do
       f)
          FILE=true
          FILEPATH=$OPTARG
+         ;;
+      n)
+         EDIT=true
          ;;
       \?)
          echo "Invalid $opt"
@@ -93,7 +92,10 @@ case $1 in
       ;;
    "get")
       DETAIL=`sed "$ARGUMENT!d" $URLS`?api_key=$APIKEY
-      DOWNLOAD=`curl $DETAIL | xml sel -t -m //results -v low_url`
+      DOWNLOAD=`curl $DETAIL | xml sel -t -m //results -v $QUALITY`
+      if [ "$EDIT" = true ]; then
+         DOWNLOAD=`echo $DOWNLOAD| sed -e "s/1800/1000/g"`
+      fi
       if [ "$FILE" = true ]; then
          curl -o $FILEPATH $DOWNLOAD
       else
