@@ -82,6 +82,21 @@ extract () {
    xml sel -t -m //$1 -v api_detail_url -n $XML > $URLS
    }
 
+download () {
+   DETAIL=`sed "$1!d" $URLS`?api_key=$APIKEY
+   DOWNLOAD=`curl $DETAIL | xml sel -t -m //results -v $QUALITY`
+   echo $DOWNLOAD
+   if [ "$EDIT" = true ]; then
+      DOWNLOAD=`echo $DOWNLOAD| sed -e "s/1800/1000/g"`
+   fi
+   if [ "$FILE" = true ]; then
+      curl -o $FILEPATH $DOWNLOAD
+   else
+      echo $DOWNLOAD | sed 's/.*\///' >> $VIDEOFILES
+      sed "$1!d" $NAMES >> $VIDEONAMES
+      cd $VIDEOS && { curl -O $DOWNLOAD ; cd - ; }
+   fi
+   }
 
 #execute command
 case $COMMAND in
@@ -94,18 +109,9 @@ case $COMMAND in
       extract video
       ;;
    "get")
-      DETAIL=`sed "$@!d" $URLS`?api_key=$APIKEY
-      DOWNLOAD=`curl $DETAIL | xml sel -t -m //results -v $QUALITY`
-      if [ "$EDIT" = true ]; then
-         DOWNLOAD=`echo $DOWNLOAD| sed -e "s/1800/1000/g"`
-      fi
-      if [ "$FILE" = true ]; then
-         curl -o $FILEPATH $DOWNLOAD
-      else
-         echo $DOWNLOAD | sed 's/.*\///' >> $VIDEOFILES
-         sed "$@!d" $NAMES >> $VIDEONAMES
-         cd $VIDEOS && { curl -O $DOWNLOAD ; cd - ; }
-      fi
+      for i in $@; do
+         download $i
+      done
       ;;
    "view")
       less -N -I $NAMES
