@@ -17,6 +17,7 @@ OFFSET=0
 FILE=false
 FILEPATH=""
 EDIT=false
+RESUME=false
 
 #check for api-key
 if [ $APIKEY == "XXX" ]; then
@@ -45,11 +46,12 @@ Commands:
 Options:
    -o        specify the offset from the beginning when using "update" and "premium"
    -f        specify where to save a file instead of managing videos internally
-   -n        retrieve 1000 instead of 1800 for newer videos'
+   -n        retrieve 1000 instead of 1800 for newer videos
+   -r        resume a the download of a partial videofile. Leads to funkyness in the list.'
 
 #parse options
 OPTIND=2
-while getopts "o:f:nh" opt; do
+while getopts "o:f:nhr" opt; do
    echo $opt
    case $opt in
       o)
@@ -64,6 +66,9 @@ while getopts "o:f:nh" opt; do
          ;;
       n)
          EDIT=true
+         ;;
+      r)
+         RESUME=true
          ;;
       \?)
          echo "Invalid $opt"
@@ -89,12 +94,17 @@ download () {
    if [ "$EDIT" = true ]; then
       DOWNLOAD=`echo $DOWNLOAD| sed -e "s/1800/1000/g"`
    fi
+   if [ "$RESUME" = true ]; then
+      RES="-C -"
+   else
+      RES=""
+   fi
    if [ "$FILE" = true ]; then
-      curl -o $FILEPATH $DOWNLOAD
+      curl $RES -o $FILEPATH $DOWNLOAD
    else
       echo $DOWNLOAD | sed 's/.*\///' >> $VIDEOFILES
       sed "$1!d" $NAMES >> $VIDEONAMES
-      cd $VIDEOS && { curl -O $DOWNLOAD ; cd - ; }
+      cd $VIDEOS && { curl $RES -O $DOWNLOAD ; cd - ; }
    fi
    }
 
