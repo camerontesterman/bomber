@@ -42,6 +42,7 @@ Commands:
    watch     play a video that has been downloaded, using the mpv player
    remove    remove a downloaded video
    clear     delete all downloaded videos
+   p4er      play the Persona 4 Endurance Run
 
 Options:
    -o        specify the offset from the beginning when using "update" and "premium"
@@ -147,6 +148,9 @@ case $COMMAND in
       done < $VIDEOFILES
       rm $VIDEONAMES
       rm $VIDEOFILES
+      ;;
+   "p4er")
+      mpv http://qlcrew.com/?playlist=P4
       ;;
    "bomb")
       echo "3..."
