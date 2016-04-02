@@ -102,11 +102,11 @@ download () {
       RES=""
    fi
    if [ "$FILE" = true ]; then
-      curl -A $UA $RES -o $FILEPATH $DOWNLOAD
+      curl -A $UA $RES -o $FILEPATH $DOWNLOAD"?api_key="$APIKEY
    else
       echo $DOWNLOAD | sed 's/.*\///' >> $VIDEOFILES
       sed "$1!d" $NAMES >> $VIDEONAMES
-      cd $VIDEOS && { curl -A $UA $RES -O $DOWNLOAD ; cd - ; }
+      cd $VIDEOS && { curl -A $UA $RES -o `echo $DOWNLOAD | sed 's/.*\///'`  $DOWNLOAD"?api_key="$APIKEY ; cd - ; }
    fi
    }
 
