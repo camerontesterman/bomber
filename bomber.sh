@@ -10,6 +10,7 @@ XML="$HOME/.bomber/xml"
 VIDEOS="$HOME/.bomber/videos/"
 VIDEONAMES="$HOME/.bomber/videonames"
 VIDEOFILES="$HOME/.bomber/videofiles"
+UA="cyborgx7bomber"
 
 #set defaults
 QUALITY=low_url
@@ -90,7 +91,7 @@ extract () {
 
 download () {
    DETAIL=`sed "$1!d" $URLS`?api_key=$APIKEY
-   DOWNLOAD=`curl $DETAIL | xml sel -t -m //results -v $QUALITY`
+   DOWNLOAD=`curl -A $UA $DETAIL | xml sel -t -m //results -v $QUALITY`
    echo $DOWNLOAD
    if [ "$EDIT" = true ]; then
       DOWNLOAD=`echo $DOWNLOAD| sed -e "s/1800/1000/g"`
@@ -101,22 +102,22 @@ download () {
       RES=""
    fi
    if [ "$FILE" = true ]; then
-      curl $RES -o $FILEPATH $DOWNLOAD
+      curl -A $UA $RES -o $FILEPATH $DOWNLOAD
    else
       echo $DOWNLOAD | sed 's/.*\///' >> $VIDEOFILES
       sed "$1!d" $NAMES >> $VIDEONAMES
-      cd $VIDEOS && { curl $RES -O $DOWNLOAD ; cd - ; }
+      cd $VIDEOS && { curl -A $UA $RES -O $DOWNLOAD ; cd - ; }
    fi
    }
 
 #execute command
 case $COMMAND in
    "update")
-      curl -o $XML "http://www.giantbomb.com/api/videos/?api_key=$APIKEY&offset=$OFFSET"
+      curl -A $UA -o $XML "http://www.giantbomb.com/api/videos/?api_key=$APIKEY&offset=$OFFSET"
       extract video
       ;;
    "premium")
-      curl -o $XML "http://www.giantbomb.com/api/videos/?api_key=$APIKEY&filter=video_type:10&offset=$OFFSET"
+      curl -A $UA -o $XML "http://www.giantbomb.com/api/videos/?api_key=$APIKEY&filter=video_type:10&offset=$OFFSET"
       extract video
       ;;
    "get")
@@ -128,7 +129,7 @@ case $COMMAND in
       less -N -I $NAMES
       ;;
    "search")
-      curl -o $XML "http://www.giantbomb.com/api/search/?api_key=$APIKEY&query=$@&resources=video"
+      curl -A $UA -o $XML "http://www.giantbomb.com/api/search/?api_key=$APIKEY&query=$@&resources=video"
       extract video
       ;;
    "list")
