@@ -1,6 +1,7 @@
 # bomber
 Download and watch videos from giantbomb.com through the command line.
 
-v0.3
+Dependency: xmlstarlet
 
+v0.3
 TODO add documentation
