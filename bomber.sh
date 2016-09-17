@@ -163,7 +163,7 @@ case $COMMAND in
       echo "BOOM!!!"
       ;;
    "")
-      echo "Please specify a command."
+      echo "$HELPTEXT"
       ;;
    *)
       echo "$COMMAND is not a valid command."
